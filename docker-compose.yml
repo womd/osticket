@@ -1,0 +1,29 @@
+---
+services:
+
+  db:
+    container_name: osticket-db
+    image: mariadb:latest
+    environment:
+      MYSQL_DATABASE: osticket
+      MYSQL_USER: osticket
+      MYSQL_PASSWORD: osticket
+      MYSQL_ROOT_PASSWORD: 'osticketDBRoot'
+    volumes:
+      - ./init.db:/docker-entrypoint-initdb.d
+      - ./db:/var/lib/mysql
+
+  osticket:
+    build: .
+    container_name: osticket
+    environment:
+      - MYSQL_HOST=osticket-db
+      - MYSQL_USER=osticket
+      - MYSQL_PASSWORD=osticket
+      - MYSQL_DATABASE=osticket
+      - INSTALL_SECRET=ostsecret123
+    volumes:
+      - ./ost-config.php:/var/www/html/include/ost-config.php
+    ports:
+      - 8081:80
+    restart: unless-stopped
